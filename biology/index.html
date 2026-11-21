@@ -1,0 +1,181 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Interactive Bio Notes · Molecule Energy Journeys</title><meta name="robots" content="noindex"><style>
+:root{--font-size-base:16px;--foreground:#173b3a;--background:#fff;--muted-foreground:#526d6b;--border:#d3e3dd;--viz-series-1:#087f73;--viz-series-2:#9c5aa5}*{box-sizing:border-box}body{margin:0;background:#eff6f2;color:var(--foreground);font:16px/1.55 system-ui,sans-serif}header{max-width:1040px;padding:22px 26px;margin:auto;display:flex;justify-content:space-between;gap:15px}header a{color:#195e52;text-decoration:none;font-weight:650}header span{font-size:14px;color:#526d6b}main{max-width:1000px;margin:8px auto 40px;padding:0 26px}.eyebrow{font-size:12px;font-weight:700;letter-spacing:1.5px;color:#127566}h1{font-size:clamp(30px,5vw,46px);letter-spacing:-1.6px;line-height:1.15;margin:14px 0}h2{font-size:24px;line-height:1.2;margin:0}.intro{color:#526d6b;max-width:740px;margin-bottom:26px}.panel{background:#fff;border:1px solid var(--border);padding:28px;border-radius:18px;box-shadow:0 10px 35px #173b3a08}.form-label{font-weight:650;display:flex;gap:12px;align-items:center;flex-wrap:wrap}.form-select{font:inherit;background:#f3f8f5;border:1px solid #b7d4c7;border-radius:8px;padding:10px 14px;color:var(--foreground);max-width:100%}.viz-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.btn{font:inherit;cursor:pointer;border:1px solid #aac9bb;border-radius:8px;background:#f6faf7;padding:10px 16px;color:var(--foreground)}.btn:hover{background:#e6f3ec}.btn[aria-pressed=true]{outline:2px solid #07816d;background:#e1f3e8}.btn-primary{background:#176b57;color:white;border-color:#176b57}.btn:disabled{opacity:.45;cursor:default}.btn:focus-visible,.form-select:focus-visible,a:focus-visible{outline:3px solid #b084df;outline-offset:3px}.text-small{font-size:14px}.text-muted{color:var(--muted-foreground)}.text-destructive{color:#b64335}.tabular-nums{font-variant-numeric:tabular-nums}.mej-check{padding:20px;background:#f3f8f5;border:1px solid #dfebe4;border-radius:12px}#mej-question{font-weight:650}#mej-caption{margin:0}footer{font-size:13px;color:#526d6b;margin-top:20px}.mej-navigation{padding-top:12px}@media(max-width:600px){header{padding:18px}header span{display:none}main{padding:0 14px}.panel{padding:18px 14px}.mej-check{padding:14px}.btn{padding:10px 12px}#molecule-energy-journeys .mej-heading{padding-inline-end:0!important}#molecule-energy-journeys #mej-map{font-size:12px}.form-select{width:100%}}
+</style></head><body><header><a href="../">Josiah’s projects</a><span>Interactive biology notes · no sign-in</span></header><main><p class="eyebrow">BIOLOGY · EXPLORE BY DOING</p><h1>You are the molecule.</h1><p class="intro">Travel through the cell and follow carbon, electrons and energy. Choose a pathway, answer each checkpoint, and watch your molecule move to its next stage.</p><section class="panel"><div id="molecule-energy-journeys">
+  <div class="viz-controls">
+    <label class="form-label" for="mej-path">Your journey
+      <select class="form-select" id="mej-path">
+        <option value="respiration">Cellular respiration</option>
+        <option value="photosynthesis">Photosynthesis</option>
+        <option value="lactate">Fermentation: lactic acid</option>
+        <option value="alcohol">Fermentation: alcoholic</option>
+      </select>
+    </label>
+  </div>
+  <div class="mej-heading">
+    <h2 id="mej-title"></h2>
+    <div class="text-small text-muted" id="mej-location"></div>
+  </div>
+  <div class="mej-scene" id="mej-scene">
+    <svg id="mej-map" role="img" aria-labelledby="mej-map-title mej-map-desc"></svg>
+  </div>
+  <div class="mej-detail" aria-live="polite">
+    <p id="mej-caption"></p>
+  </div>
+  <div class="mej-check">
+    <div id="mej-question"></div>
+    <div class="viz-row" id="mej-choices"></div>
+    <div class="text-small" id="mej-feedback" role="status" aria-live="polite"></div>
+  </div>
+  <div class="viz-row mej-navigation">
+    <button class="btn" id="mej-prev" type="button">Previous</button>
+    <span class="text-small tabular-nums" id="mej-count"></span>
+    <button class="btn btn-primary" id="mej-next" type="button">Next</button>
+  </div>
+</div>
+<style>
+#molecule-energy-journeys{display:flex;flex-direction:column;gap:calc(var(--font-size-base)*1);color:var(--foreground)}
+#molecule-energy-journeys .mej-heading{display:flex;flex-direction:column;gap:calc(var(--font-size-base)*.25);padding-inline-end:90px}
+#molecule-energy-journeys .mej-scene{width:100%;min-width:0}
+#molecule-energy-journeys #mej-map{display:block;width:100%;height:350px;overflow:visible}
+#molecule-energy-journeys .mej-detail{min-height:calc(var(--font-size-base)*3)}
+#molecule-energy-journeys .mej-check{display:flex;flex-direction:column;gap:calc(var(--font-size-base)*.5)}
+#molecule-energy-journeys .mej-navigation{justify-content:space-between}
+#molecule-energy-journeys .mej-structure{fill:var(--background);stroke:color-mix(in srgb,var(--foreground) 45%,var(--background));stroke-width:1.2}
+#molecule-energy-journeys .mej-fold{fill:none;stroke:color-mix(in srgb,var(--foreground) 30%,var(--background));stroke-width:1.2}
+#molecule-energy-journeys .mej-flow{fill:none;stroke:var(--viz-series-1);stroke-width:2}
+#molecule-energy-journeys .mej-wait{fill:none;stroke:var(--border);stroke-width:1.2;stroke-dasharray:4 5}
+#molecule-energy-journeys .mej-label{fill:var(--foreground);font:inherit}
+#molecule-energy-journeys .mej-small{fill:var(--muted-foreground);font:inherit}
+#molecule-energy-journeys .mej-you{transition:transform 550ms ease}
+#molecule-energy-journeys .mej-carbon{fill:var(--viz-series-1);stroke:none}
+#molecule-energy-journeys .mej-token{fill:color-mix(in srgb,var(--viz-series-1) 12%,var(--background));stroke:var(--viz-series-1);stroke-width:1.5}
+#molecule-energy-journeys .mej-carrier{fill:color-mix(in srgb,var(--viz-series-2) 13%,var(--background));stroke:var(--viz-series-2);stroke-width:1.5}
+@media(prefers-reduced-motion:reduce){#molecule-energy-journeys .mej-you{transition:none}}
+</style>
+<script>
+(() => {
+  const root = document.getElementById('molecule-energy-journeys');
+  const el = id => root.querySelector('#mej-' + id);
+  const paths = {
+    respiration: {name:'Cellular respiration', organelle:'mitochondrion', steps:[
+      {title:'You arrive as glucose',location:'Cytoplasm',follow:'glucose carbon',token:'Glucose · 6 C',shape:'six',pos:[.25,85],caption:'You are one glucose molecule: six carbon atoms carrying stored chemical energy.',question:'What are you carrying at the start?',choices:['Stored chemical energy','A supply of oxygen','ATP made by respiration'],answer:0,why:'Glucose carries chemical energy. Respiration transfers some of that energy into ATP.'},
+      {title:'Glycolysis splits you in two',location:'Cytoplasm',follow:'glucose carbon',token:'2 pyruvate · 3 C each',shape:'two3',pos:[.5,85],caption:'Your six carbons become two pyruvate molecules; glycolysis nets 2 ATP and loads electrons onto 2 NADH.',question:'What does NADH carry onward?',choices:['High-energy electrons','The two ATP molecules','Oxygen into the cell'],answer:0,why:'NADH is an electron carrier. It transports electrons, rather than storing ATP inside itself.',flow:'ATP: +2 net · NADH: 2'},
+      {title:'Enter the mitochondrion',location:'Mitochondrial matrix',follow:'glucose carbon',token:'2 acetyl-CoA · 2 C each',shape:'two2',pos:[.5,205],caption:'Each pyruvate loses one carbon as CO₂; four carbons remain in two acetyl groups carried by coenzyme A.',question:'Where did the other two carbons go?',choices:['Into ATP','Out as 2 CO₂','Into oxygen'],answer:1,why:'Two carbon dioxide molecules leave during pyruvate oxidation. NADH also collects electrons.',gas:'2 CO₂ released'},
+      {title:'The Krebs cycle releases the rest',location:'Mitochondrial matrix',follow:'glucose-derived carbon',token:'Carbon leaves as CO₂',shape:'co2',pos:[.34,245],caption:'Across the pathway, the remaining four glucose-derived carbons leave as CO₂; carriers collect electrons and the cycle makes 2 ATP per glucose.',question:'Does glucose carbon turn into ATP?',choices:['Yes, ATP is the leftover carbon','No, carbon exits as CO₂'],answer:1,why:'ATP is made from ADP and phosphate. Energy is transferred; glucose carbon does not become ATP.',gas:'4 more CO₂ · 6 total',flow:'ATP: +2 · NADH + FADH₂ loaded'},
+      {title:'Switch roles: follow the electrons',location:'Matrix → inner membrane',follow:'electron energy, not carbon',token:'YOU: electrons on carriers',shape:'carrier',pos:[.62,235],caption:'Your carbon journey is over. Now follow energy-bearing electrons on NADH and FADH₂ toward the electron transport chain.',question:'After a carrier donates its electrons, can it be used again?',choices:['Yes, NAD⁺ or FAD can be reloaded','No, it becomes ATP'],answer:0,why:'NADH returns to NAD⁺, and FADH₂ returns to FAD. These carriers can collect electrons again.'},
+      {title:'Electron transport builds a gradient',location:'Inner mitochondrial membrane',follow:'electron energy',token:'YOU: electrons → O₂',shape:'electron',pos:[.7,180],caption:'Electron energy pumps H⁺ across the inner membrane; oxygen accepts electrons at the end and helps form water.',question:'What is oxygen’s role here?',choices:['Final electron acceptor','Source of glucose carbon','Enzyme that makes ATP'],answer:0,why:'Oxygen accepts electrons at the end of the chain. Without it, aerobic electron transport cannot keep running.',flow:'H⁺ accumulates outside the matrix',gas:'O₂ → H₂O'},
+      {title:'ATP synthase captures usable energy',location:'Inner mitochondrial membrane',follow:'energy through H⁺ flow',token:'H⁺ flow → ATP',shape:'atp',pos:[.7,270],caption:'H⁺ flows back into the matrix through ATP synthase, powering ADP + phosphate → ATP; this stage makes most of respiration’s ATP.',question:'What directly drives ATP synthase?',choices:['Carbon dioxide leaving the cell','H⁺ flowing down its gradient','Glucose entering the chain'],answer:1,why:'The H⁺ gradient stores potential energy. Flow through ATP synthase powers ATP production.',flow:'Most ATP is made here'}
+    ]},
+    photosynthesis: {name:'Photosynthesis',organelle:'chloroplast',steps:[
+      {title:'You begin as carbon dioxide',location:'Outside the chloroplast → stroma',follow:'CO₂ carbon',token:'YOU: CO₂ · 1 C',shape:'one',pos:[.24,85],caption:'This time you start as carbon in CO₂. You will become part of a sugar rather than arrive as glucose.',question:'Where will the sugar’s carbon come from?',choices:['Carbon dioxide','Water','Sunlight'],answer:0,why:'CO₂ supplies carbon. Light supplies energy; water supplies electrons for the light reactions.'},
+      {title:'Light reactions prepare the energy',location:'Thylakoid membrane; your CO₂ waits',follow:'CO₂ carbon waiting in stroma',token:'YOU: CO₂ waits',shape:'one',pos:[.28,280],caption:'While your carbon waits, light reactions split water, release O₂, and use light energy to produce ATP and NADPH.',question:'The released oxygen comes from…',choices:['CO₂','Water','Glucose'],answer:1,why:'The oxygen released by the light reactions comes from splitting water, not from CO₂.',flow:'Light + H₂O → O₂ · ATP + NADPH'},
+      {title:'ATP and NADPH reach the Calvin cycle',location:'Stroma',follow:'CO₂ carbon',token:'YOU: CO₂ + ready carriers',shape:'one',pos:[.65,280],caption:'ATP supplies energy; NADPH supplies high-energy electrons for the Calvin cycle, where your carbon will be used.',question:'Which carrier supplies high-energy electrons?',choices:['NADPH','ATP','CO₂'],answer:0,why:'NADPH carries reducing power. ATP provides energy for the cycle’s reactions.',flow:'ATP + NADPH → Calvin cycle'},
+      {title:'Carbon fixation brings you into the cycle',location:'Stroma',follow:'CO₂ carbon fixed into molecules',token:'YOU: fixed carbon',shape:'one',pos:[.3,245],caption:'The Calvin cycle incorporates CO₂ carbon into organic molecules; ATP and NADPH help turn those molecules into G3P.',question:'Where does the Calvin cycle occur?',choices:['Stroma','Thylakoid interior','Mitochondrial matrix'],answer:0,why:'The Calvin cycle occurs in the stroma, the fluid around the thylakoids.'},
+      {title:'G3P can become sugar',location:'Stroma → sugar-building pathways',follow:'carbon toward sugar',token:'2 G3P → sugar',shape:'two3',pos:[.7,280],caption:'Some three-carbon G3P leaves the cycle; two net G3P provide enough carbon to build one six-carbon sugar.',question:'Is glucose the direct product that leaves the Calvin cycle?',choices:['No, G3P leaves and can build sugars','Yes, whole glucose exits each turn'],answer:0,why:'The cycle’s net carbohydrate output is G3P. Cells use it to make glucose and other organic molecules.',flow:'Carbon is retained in organic molecules'},
+      {title:'You are now part of stored food energy',location:'Plant cell',follow:'carbon in sugar',token:'Sugar · 6 C',shape:'six',pos:[.5,85],caption:'Your CO₂ carbon is now part of sugar; NADP⁺ and ADP return to the light reactions to be recharged.',question:'What returns to the light reactions?',choices:['ADP and NADP⁺','Glucose and CO₂','Lactate and ethanol'],answer:0,why:'ATP becomes ADP after energy use, and NADPH becomes NADP⁺ after donating electrons. Both can be recharged.',flow:'Light → stored chemical energy'}
+    ]},
+    lactate:{name:'Lactic acid fermentation',organelle:null,steps:[
+      {title:'You start as glucose',location:'Cytoplasm',follow:'glucose carbon',token:'Glucose · 6 C',shape:'six',pos:[.25,140],caption:'You remain in the cytoplasm for this entire route; fermentation keeps glycolysis working when aerobic respiration is limited.',question:'Will this route take you into a mitochondrion?',choices:['No, it stays in the cytoplasm','Yes, fermentation requires the matrix'],answer:0,why:'Glycolysis and lactic acid fermentation happen in the cytoplasm.'},
+      {title:'Glycolysis makes the ATP',location:'Cytoplasm',follow:'glucose carbon',token:'2 pyruvate · 3 C each',shape:'two3',pos:[.5,150],caption:'Glucose splits into two pyruvate molecules, producing 2 net ATP and 2 NADH per glucose.',question:'How much ATP has this pathway gained so far?',choices:['2 net ATP','36 ATP','No ATP'],answer:0,why:'Glycolysis nets 2 ATP per glucose. Fermentation itself does not add more ATP.',flow:'ATP: +2 net · NADH loaded'},
+      {title:'NADH passes electrons to pyruvate',location:'Cytoplasm',follow:'carbon + carrier recycling',token:'Pyruvate → lactate',shape:'two3',pos:[.7,220],caption:'Pyruvate accepts electrons from NADH and becomes lactate; NADH is recycled into NAD⁺.',question:'Why does the cell need NAD⁺ back?',choices:['So glycolysis can keep accepting electrons','To add oxygen to lactate','To turn lactate directly into ATP'],answer:0,why:'Glycolysis needs NAD⁺ as an electron acceptor. Fermentation regenerates it.',flow:'NADH → NAD⁺ → back to glycolysis'},
+      {title:'Your carbon stays in lactate',location:'Cytoplasm',follow:'carbon in lactate',token:'2 lactate · 3 C each',shape:'two3',pos:[.5,260],caption:'All six carbons remain in two lactate molecules; the ATP yield stays at the 2 made by glycolysis.',question:'What extra ATP did fermentation itself produce?',choices:['0 extra ATP','2 extra ATP','Most of the cell’s ATP'],answer:0,why:'Fermentation’s payoff is regenerated NAD⁺, which allows glycolysis to continue.',flow:'2 ATP total · no CO₂ released'}
+    ]},
+    alcohol:{name:'Alcoholic fermentation',organelle:null,steps:[
+      {title:'You start as glucose',location:'Cytoplasm',follow:'glucose carbon',token:'Glucose · 6 C',shape:'six',pos:[.25,140],caption:'In yeast, your glucose carbon can take an oxygen-independent route through alcoholic fermentation.',question:'Where does this route happen?',choices:['Cytoplasm','Chloroplast','Mitochondrial inner membrane'],answer:0,why:'Glycolysis and alcoholic fermentation take place in the cytoplasm.'},
+      {title:'Glycolysis makes the ATP',location:'Cytoplasm',follow:'glucose carbon',token:'2 pyruvate · 3 C each',shape:'two3',pos:[.5,150],caption:'Glucose becomes two pyruvate molecules; glycolysis nets 2 ATP and transfers electrons to NADH.',question:'What carries those electrons?',choices:['NADH','Carbon dioxide','Oxygen'],answer:0,why:'NAD⁺ accepts electrons during glycolysis and becomes NADH.',flow:'ATP: +2 net · NADH loaded'},
+      {title:'Two carbons leave as carbon dioxide',location:'Cytoplasm',follow:'glucose carbon',token:'2 acetaldehyde · 2 C each',shape:'two2',pos:[.7,220],caption:'Each pyruvate loses one carbon as CO₂, leaving two two-carbon acetaldehyde molecules.',question:'How many of your six carbons have left as CO₂?',choices:['2','4','6'],answer:0,why:'Two pyruvate molecules each release one CO₂, so four carbons remain.',gas:'2 CO₂ released'},
+      {title:'NAD⁺ returns; ethanol remains',location:'Cytoplasm',follow:'carbon in ethanol',token:'2 ethanol · 2 C each',shape:'two2',pos:[.5,260],caption:'NADH donates electrons to acetaldehyde, forming ethanol and regenerating NAD⁺; fermentation adds no ATP beyond glycolysis’s 2.',question:'What lets glycolysis keep running?',choices:['Regenerated NAD⁺','Ethanol becoming oxygen','Extra ATP from fermentation'],answer:0,why:'Recycling NAD⁺ keeps an electron acceptor available for glycolysis.',flow:'2 ethanol + 2 CO₂ · 2 ATP total'}
+    ]}
+  };
+  let state = {path:'respiration',positions:{},answers:{},finished:{}};
+  let lastPoint = null;
+  const svg = el('map');
+  const esc = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  function acceptState(saved) {
+    const v = saved && saved.privateContent;
+    if (!v || !paths[v.path]) return;
+    state = {path:v.path,positions:{},answers:{},finished:{}};
+    for (const key of Object.keys(paths)) {
+      const n = v.positions && v.positions[key];
+      state.positions[key] = Number.isInteger(n) ? Math.max(0,Math.min(paths[key].steps.length-1,n)) : 0;
+      state.answers[key] = {};
+      for (let i=0;i<paths[key].steps.length;i++) {
+        const a = v.answers && v.answers[key] && v.answers[key][i];
+        if (Number.isInteger(a) && a>=0 && a<paths[key].steps[i].choices.length) state.answers[key][i]=a;
+      }
+      state.finished[key] = Boolean(v.finished && v.finished[key]);
+    }
+  }
+  function save() {
+    try { localStorage.setItem('bio-energy-journeys-v1',JSON.stringify({privateContent:state})); } catch (_) {}
+    if (!window.openai || !window.openai.setWidgetState) return;
+    const p = paths[state.path], i=state.positions[state.path]||0;
+    const value={modelContent:{pathway:p.name,stage:p.steps[i].title,following:p.steps[i].follow,completed:Boolean(state.finished[state.path])},privateContent:state};
+    try { Promise.resolve(window.openai.setWidgetState(value)).catch(()=>{}); } catch (_) {}
+  }
+  function tokenShape(s) {
+    const dot=(x,y)=>`<circle class="mej-carbon" cx="${x}" cy="${y}" r="5"/>`;
+    if(s==='six') return [-25,-15,-5,5,15,25].map(x=>dot(x,0)).join('');
+    if(s==='two3') return [-32,-22,-12,12,22,32].map(x=>dot(x,0)).join('');
+    if(s==='two2') return [-24,-14,14,24].map(x=>dot(x,0)).join('');
+    if(s==='one') return dot(0,0);
+    if(s==='co2') return `<circle class="mej-token" r="21"/><text class="mej-label" y="5" text-anchor="middle">CO₂</text>`;
+    return `<ellipse class="${s==='carrier'?'mej-carrier':'mej-token'}" rx="38" ry="20"/><text class="mej-label" y="5" text-anchor="middle">${s==='carrier'?'NADH':s==='atp'?'ATP':'e⁻'}</text>`;
+  }
+  function draw() {
+    const p=paths[state.path], s=p.steps[state.positions[state.path]||0];
+    const w=Math.max(280,Math.round(el('scene').clientWidth || 600)), h=350;
+    const x=s.token.length>22?w/2:Math.max(100,Math.min(w-100,w*s.pos[0])), y=s.pos[1];
+    const ox=28, ow=w-56;
+    let organelle='';
+    if(p.organelle==='mitochondrion') {
+      organelle=`<rect class="mej-structure" x="${ox}" y="145" width="${ow}" height="180" rx="75"/><rect class="mej-fold" x="${ox+10}" y="155" width="${ow-20}" height="160" rx="65"/><text class="mej-label" x="${w/2}" y="136" text-anchor="middle">Mitochondrion</text><text class="mej-small" x="${ox+22}" y="299">Matrix</text>`;
+      for(let k=0;k<4;k++){const fx=ox+45+k*(ow-90)/3;organelle+=`<path class="mej-fold" d="M${fx} 160 v30 q0 15 12 15 h8 q12 0 12 15 v65"/>`;}
+      if(s.shape==='electron'||s.shape==='atp'){
+        organelle+=`<text class="mej-small" x="${w/2}" y="332" text-anchor="middle">Inner membrane → ATP synthase</text>`;
+        for(let k=0;k<3;k++)organelle+=`<text class="mej-label" x="${ox+33+k*29}" y="168">H⁺</text>`;
+        const ax=ox+65;
+        organelle+=`<path class="mej-structure" d="M${ax-14} 174 h28 v24 l-8 10 v12 h-12 v-12 l-8-10Z"/><path class="mej-flow" d="M${ax} 149 v79" marker-end="url(#mej-arrow)"/><text class="mej-label" x="${ax}" y="250" text-anchor="middle">ATP synthase</text><text class="mej-small" x="${ax}" y="273" text-anchor="middle">ADP → ATP</text>`;
+        const ex=Math.min(w-65,w*.73);
+        organelle+=`<line class="mej-fold" x1="${ex-35}" y1="185" x2="${ex+35}" y2="185"/><rect class="mej-structure" x="${ex-38}" y="174" width="16" height="22" rx="5"/><rect class="mej-structure" x="${ex-8}" y="174" width="16" height="22" rx="5"/><rect class="mej-structure" x="${ex+22}" y="174" width="16" height="22" rx="5"/><path class="mej-flow" d="M${ex+30} 173 v-23" marker-end="url(#mej-arrow)"/><text class="mej-small" x="${ex}" y="${s.shape==='atp'?216:237}" text-anchor="middle">ETC: H⁺ out</text>`;
+      }
+    } else if(p.organelle==='chloroplast') {
+      organelle=`<rect class="mej-structure" x="${ox}" y="145" width="${ow}" height="180" rx="75"/><rect class="mej-fold" x="${ox+9}" y="154" width="${ow-18}" height="162" rx="68"/><text class="mej-label" x="${w/2}" y="136" text-anchor="middle">Chloroplast</text><text class="mej-small" x="${ox+24}" y="300">Stroma</text>`;
+      for(let k=0;k<2;k++){const tx=w*(k===0?.32:.67);for(let z=0;z<3;z++)organelle+=`<ellipse class="mej-structure" cx="${tx}" cy="${183+z*10}" rx="29" ry="6"/>`;}
+      organelle+=`<text class="mej-small" x="${w/2}" y="233" text-anchor="middle">Thylakoids</text>`;
+    }
+    const prev=lastPoint || [x,y];
+    const scene=`<title id="mej-map-title">${esc(p.name)}: ${esc(s.title)}</title><desc id="mej-map-desc">You follow ${esc(s.follow)}. Current compartment: ${esc(s.location)}. ${esc(s.caption)}</desc><defs><marker id="mej-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M1 1 L8 5 L1 9" fill="none" stroke="var(--viz-series-1)" stroke-width="1.4"/></marker></defs><rect class="mej-structure" x="8" y="8" width="${w-16}" height="334" rx="50"/><text class="mej-small" x="30" y="34">Cell · cytoplasm</text>${organelle}${p.organelle?`<path class="mej-wait" d="M${w*.25} 107 Q${w*.5} 110 ${w*.5} 157"/>`:''}<g class="mej-you" id="mej-you" style="transform:translate(${prev[0]}px,${prev[1]}px)"><text class="mej-label" y="-29" text-anchor="middle">YOU</text>${tokenShape(s.shape)}<text class="mej-label" y="35" text-anchor="middle">${esc(s.token)}</text></g>`;
+    svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=scene;
+    if(s.gas){const gx=w-40;svg.insertAdjacentHTML('beforeend',`<path class="mej-flow" d="M${w*.65} 112 L${gx} 65" marker-end="url(#mej-arrow)"/><text class="mej-small" x="${w/2}" y="54" text-anchor="middle">${esc(s.gas)}</text>`);}
+    if(s.flow)svg.insertAdjacentHTML('beforeend',`<text class="mej-small" x="${w/2}" y="${p.organelle?108:65}" text-anchor="middle">${esc(s.flow)}</text>`);
+    const you=svg.querySelector('#mej-you');
+    requestAnimationFrame(()=>{you.style.transform=`translate(${x}px,${y}px)`;});
+    lastPoint=[x,y];
+  }
+  function render() {
+    const p=paths[state.path], i=state.positions[state.path]||0, s=p.steps[i];
+    const a=state.answers[state.path] && state.answers[state.path][i], correct=a===s.answer;
+    el('path').value=state.path;el('title').textContent=s.title;
+    el('location').textContent=s.location+' · following '+s.follow;
+    el('caption').textContent=s.caption;el('question').textContent=s.question;
+    el('choices').replaceChildren();
+    s.choices.forEach((label,j)=>{const button=document.createElement('button');button.type='button';button.className='btn';button.textContent=label;button.setAttribute('aria-pressed',String(a===j));button.addEventListener('click',()=>{(state.answers[state.path] ||= {})[i]=j;render();save();});el('choices').append(button);});
+    el('feedback').textContent=a===undefined?'Answer to unlock the next step.':correct?'Correct. '+s.why:'Try again. '+(i===0?'Look at who you are and where you are.':'Follow the molecule or carrier shown above.');
+    el('feedback').classList.toggle('text-destructive',a!==undefined&&!correct);
+    el('prev').disabled=i===0;el('next').disabled=!correct || Boolean(state.finished[state.path] && i===p.steps.length-1);
+    el('next').textContent=i===p.steps.length-1?(state.finished[state.path]?'Journey complete':'Finish'):'Next';
+    el('count').textContent=`${i+1} / ${p.steps.length}`;
+    draw();
+  }
+  el('path').addEventListener('change',()=>{state.path=el('path').value;lastPoint=null;render();save();});
+  el('prev').addEventListener('click',()=>{const i=state.positions[state.path]||0;if(i>0){state.positions[state.path]=i-1;render();save();}});
+  el('next').addEventListener('click',()=>{const p=paths[state.path],i=state.positions[state.path]||0;if(!state.answers[state.path] || state.answers[state.path][i]!==p.steps[i].answer)return;if(i<p.steps.length-1)state.positions[state.path]=i+1;else state.finished[state.path]=true;render();save();});
+  try { acceptState(JSON.parse(localStorage.getItem('bio-energy-journeys-v1'))); } catch (_) {}
+  acceptState(window.openai && window.openai.widgetState);
+  window.addEventListener('openai:set_globals',event=>{const globals=event.detail && event.detail.globals;if(globals && globals.widgetState){acceptState(globals.widgetState);lastPoint=null;render();}});
+  new ResizeObserver(()=>{lastPoint=null;draw();}).observe(el('scene'));
+  render();
+})();
+</script>
+</section><footer>Four journeys: cellular respiration, photosynthesis, lactic acid fermentation and alcoholic fermentation. Progress saves in this browser.</footer></main></body></html>
